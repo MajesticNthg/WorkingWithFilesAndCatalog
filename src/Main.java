@@ -16,51 +16,50 @@ public class Main {
     }
 
     // Задание 4.2
-    public static ArrayList<File> listTwoList(String path, String exFile, boolean flag) throws Exception {
-        File root = new File("F:\\Программирование\\Обучение Java\\2 курс (с нуля)\\15 Работа с файлами и каталогами");
+    public static ArrayList<ArrayList<File>> listTwoList(String path, String exFile, boolean flag) {
+        ArrayList<ArrayList<File>> res = new ArrayList<ArrayList<File>>();
+        ArrayList<File> fileEx = new ArrayList<File>(); // файлы с заданным расширением
+        ArrayList<File> catalog = new ArrayList<File>(); // каталоги
+        res.add(fileEx);
+        res.add(catalog);
         ArrayList<File> expand = new ArrayList<File>();
-        ArrayList<File> catalog = new ArrayList<File>();
-        ArrayList<File> fileEx = new ArrayList<File>();
-        expand.add(root);
+        File root = new File(path);
+        expand.addAll(Arrays.asList(root.listFiles()));
 
         int z = 0; // количество уровней вложенности
-        if (flag = true)
+        if (flag)
             z = 3;
         for(int depth = 0; depth < z; depth++) {
             File[] expandCopy = expand.toArray(new File[expand.size()]);
             expand.clear();
             for (File file : expandCopy) {
-                String x = file.getName();
-                if (x.endsWith(exFile)) {
-                    fileEx.add(file);
-                }
-                catalog.add(file);
                 if (file.isDirectory()) {
                     expand.addAll(Arrays.asList(file.listFiles()));
+                    if (!catalog.contains(file))
+                        catalog.add(file);
+                } else {
+                    String x = file.getName();
+                    if (x.endsWith(exFile)) {
+                        fileEx.add(file);
+                    }
+
                 }
             }
         }
-        ArrayList<File> globalList = new ArrayList<File>();
-        globalList.addAll(catalog);
-        globalList.addAll(fileEx);
 
-        System.out.println(globalList);
-        return globalList;
+        return res;
     }
 
     // Задание 4.3
     public static boolean delCatalog (String path) {
-        File new_testDir = new File("F:\\Программирование\\Обучение Java\\2 курс (с нуля)\\15 Работа с файлами и каталогами\\test_catalog_del");
-        new_testDir.mkdir();
-        new_testDir.delete();
-        if (new_testDir.exists()) {
-            System.out.println("ERROR - каталог не пуст");
-            return true;
-        }
-        else {
-            System.out.println("Успешно");
-            return false;
-        }
+        ArrayList<ArrayList<File>> r = listTwoList(path, ".txt", true);
+
+        if(r.get(1).size() > 0) return false;
+        for(int i=0; i<r.get(0).size(); i++)
+            if(! r.get(0).get(i).delete()) return false;
+        File del = new File(path);
+        if(! del.delete()) return false;
+        return true;
     }
 
 
@@ -96,14 +95,13 @@ public class Main {
         File my_fil5 = new File("F:\\Программирование\\Обучение Java\\2 курс (с нуля)\\15 Работа с файлами и каталогами\\my_test_dir\\777.txt");
         BufferedWriter bw5 = new BufferedWriter(new FileWriter(my_fil5));
 
-        String s = my_fil3.getName();
-        listTwoList("F:\\Программирование\\Обучение Java\2 курс (с нуля)\15 Работа с файлами и каталогами", exFile(s), true);
+        listTwoList("F:\\Программирование\\Обучение Java\\2 курс (с нуля)\\15 Работа с файлами и каталогами", ".txt", true);
 
 
         File new_testDir = new File("F:\\Программирование\\Обучение Java\\2 курс (с нуля)\\15 Работа с файлами и каталогами\\test_catalog_del");
         new_testDir.mkdir();
 
-        String delFile = "F:\\Программирование\\Обучение Java\2 курс (с нуля)\15 Работа с файлами и каталогами\test_catalog_del";
+        String delFile = "F:\\Программирование\\Обучение Java\\2 курс (с нуля)\\15 Работа с файлами и каталогами\\test_catalog_del";
         delCatalog(delFile);
     }
 }
